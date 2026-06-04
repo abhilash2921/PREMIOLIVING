@@ -1,0 +1,14 @@
+# Netlify configuration file for direct app folder deployment
+[build]
+  publish = "."
+
+# Redirect rules for pretty URLs
+[[redirects]]
+  from = "/login"
+  to = "/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/index"
+  to = "/index.html"
+  status = 200

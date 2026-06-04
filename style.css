@@ -1,0 +1,338 @@
+/* style.css - Premio Living OS Calmed Premium Aesthetic V3 */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  
+  /* --- COLD MATTE DARK THEME (DEFAULT) --- */
+  --bg-primary: #0a0b0d;      /* Matte Pitch Black */
+  --bg-secondary: #111215;    /* Deep Slate Gray */
+  --bg-card: #15171c;         /* Card background */
+  --bg-hover: #1f2128;        /* Clear dark hover state */
+  --border-color: #262830;    /* Muted Slate borders */
+  --border-focus: #c5a880;    /* Muted Luxury Gold/Brass */
+  
+  --color-gold: #c5a880;      /* Muted Gold */
+  --color-gold-bright: #d4af37;
+  --color-emerald: #10b981;   /* Emerald Green */
+  --color-red: #f43f5e;       /* Calm Rose/Red */
+  --color-blue: #3b82f6;      /* Calm Blue */
+  
+  --text-primary: #f3f4f6;    /* Clean off-white */
+  --text-secondary: #9ca3af;  /* Slate gray */
+  --text-muted: #6b7280;      /* Dark slate-500 */
+}
+
+/* --- LIGHT THEME (ACCESSIBLE SWITCHER OVERRIDES) --- */
+body.light-mode {
+  --bg-primary: #f6f8fa;      /* Notion Light Gray */
+  --bg-secondary: #ffffff;    /* Pure White Sidebar */
+  --bg-card: #ffffff;         /* Crisp White Card */
+  --bg-hover: #f1f3f5;        /* Light grey hover */
+  --border-color: #d1d5db;    /* Solid grey border line */
+  --border-focus: #8c6d3f;    /* Legible dark bronze */
+  
+  --color-gold: #8c6d3f;      /* Dark Legible Gold */
+  --color-gold-bright: #aa854e;
+  --color-emerald: #0d9488;
+  --color-red: #e11d48;
+  --color-blue: #2563eb;
+  
+  --text-primary: #111827;    /* Slate-900 */
+  --text-secondary: #4b5563;  /* Slate-600 */
+  --text-muted: #9ca3af;      /* Slate-400 */
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+/* --- OVERRIDES FOR ACCESSIBILITY --- */
+.text-white {
+  color: var(--text-primary) !important;
+}
+.text-secondary {
+  color: var(--text-secondary) !important;
+}
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold);
+}
+
+/* Restrained Card Styling */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.card:hover {
+  border-color: rgba(197, 168, 128, 0.3);
+}
+
+/* Active Nav Button */
+.nav-btn-active {
+  background-color: var(--bg-hover);
+  border-left: 2px solid var(--color-gold);
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+}
+
+/* Quick inputs styling */
+input, select, textarea {
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  height: 40px; /* Thumb-friendly height */
+  border-radius: 6px !important;
+  font-size: 0.825rem !important;
+  padding: 0 12px !important;
+  transition: border-color 0.15s ease;
+}
+textarea {
+  height: auto !important;
+  padding: 8px 12px !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--border-focus) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px var(--border-focus) !important;
+}
+
+/* Floating Action Button & Quick action list on phones */
+.fab-btn {
+  position: fixed;
+  bottom: 80px; /* Clears bottom nav height on mobile */
+  right: 20px;
+  width: 52px;
+  height: 52px;
+  border-radius: 26px;
+  background-color: var(--color-gold);
+  color: #0a0b0d;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.fab-btn:hover {
+  transform: scale(1.08);
+  background-color: var(--color-gold-bright);
+}
+.fab-btn:active {
+  transform: scale(0.92);
+}
+@media (min-width: 768px) {
+  .fab-btn {
+    bottom: 24px;
+    right: 24px;
+  }
+}
+
+.fab-menu {
+  position: fixed;
+  bottom: 142px;
+  right: 20px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 160px;
+  animation: scaleIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fab-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.1s ease;
+}
+.fab-item:hover, .fab-item:active {
+  background-color: var(--bg-hover);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.15s ease-out forwards;
+}
+.animate-scale-in {
+  animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Table Styles */
+table th {
+  font-weight: 500;
+  font-size: 0.725rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Hide scrollbars for layouts */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile bottom nav spacer */
+@media (max-width: 767px) {
+  #main-content-container {
+    padding-bottom: 90px !important; /* Space for Bottom Nav */
+  }
+}
+
+/* Print View Styles */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
+
+/* --- DARK/LIGHT MODE COLOR CONTRAST OVERRIDES --- */
+body.light-mode .text-amber-500,
+body.light-mode .text-amber-400 {
+  color: #b45309 !important; /* amber-700 */
+}
+body.light-mode .text-rose-400,
+body.light-mode .text-rose-500 {
+  color: #be123c !important; /* rose-700 */
+}
+body.light-mode .text-emerald-400,
+body.light-mode .text-emerald-500 {
+  color: #047857 !important; /* emerald-700 */
+}
+body.light-mode .text-blue-400,
+body.light-mode .text-blue-500 {
+  color: #1d4ed8 !important; /* blue-700 */
+}
+body.light-mode .text-teal-400,
+body.light-mode .text-teal-500 {
+  color: #0f766e !important; /* teal-700 */
+}
+body.light-mode .text-purple-400,
+body.light-mode .text-purple-500 {
+  color: #6d28d9 !important; /* purple-700 */
+}
+body.light-mode .text-cyan-400,
+body.light-mode .text-cyan-500 {
+  color: #0369a1 !important; /* cyan-700 */
+}
+body.light-mode .text-green-400,
+body.light-mode .text-green-500 {
+  color: #15803d !important; /* green-700 */
+}
+body.light-mode .text-red-400,
+body.light-mode .text-red-500 {
+  color: #b91c1c !important; /* red-700 */
+}
+
+/* Force solid colors instead of transparency for bg elements in light-mode */
+body.light-mode .bg-primary\/10,
+body.light-mode .bg-primary\/20,
+body.light-mode .bg-primary\/30,
+body.light-mode .bg-primary\/40,
+body.light-mode .bg-primary\/45,
+body.light-mode .bg-primary\/50 {
+  background-color: var(--bg-hover) !important;
+}
+
+body.light-mode .bg-secondary\/10,
+body.light-mode .bg-secondary\/20,
+body.light-mode .bg-secondary\/30,
+body.light-mode .bg-secondary\/35,
+body.light-mode .bg-secondary\/40,
+body.light-mode .bg-secondary\/50 {
+  background-color: var(--bg-primary) !important;
+}
+
+body.light-mode .border-border-color\/10,
+body.light-mode .border-border-color\/20,
+body.light-mode .border-border-color\/25,
+body.light-mode .border-border-color\/30,
+body.light-mode .border-border-color\/40,
+body.light-mode .border-border-color\/60 {
+  border-color: var(--border-color) !important;
+}
+
+/* Eliminate low-contrast transparent text colors in light mode */
+body.light-mode .text-white\/20,
+body.light-mode .text-white\/30,
+body.light-mode .text-white\/50,
+body.light-mode .text-white\/70 {
+  color: var(--text-secondary) !important;
+}
+
+body.light-mode .text-secondary\/70,
+body.light-mode .text-secondary\/80 {
+  color: var(--text-primary) !important;
+}
+
+body.light-mode .text-amber-500\/70,
+body.light-mode .text-amber-500\/80 {
+  color: #b45309 !important;
+}
