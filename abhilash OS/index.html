@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premio Living OS — Interior Design & Site Execution OS</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: 'var(--bg-primary)',
+            secondary: 'var(--bg-secondary)',
+            card: 'var(--bg-card)',
+            hover: 'var(--bg-hover)',
+            'border-color': 'var(--border-color)',
+            'gold-color': 'var(--color-gold)',
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="h-full bg-primary text-white flex flex-col md:flex-row overflow-hidden dark-mode">
+
+  <!-- Print Header Only (Hidden in screen) -->
+  <div class="hidden print-header print-only">
+    <h1>Premio Living</h1>
+    <p>Project Statement & Execution Estimate</p>
+  </div>
+
+  <!-- Mobile Top Bar -->
+  <div class="md:hidden flex items-center justify-between px-4 py-3 bg-secondary border-b border-border-color w-full z-30 no-print">
+    <div class="flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+      <span class="font-display font-bold tracking-wider text-sm uppercase text-white">Premio Living</span>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <!-- Hidden ArchAI Copilot button for presentation readiness -->
+      <!--
+      <button onclick="toggleAIDrawer()" class="p-1.5 text-amber-500 hover:text-amber-400 transition-colors" title="ArchAI Copilot">
+        <i data-lucide="sparkles" class="w-4 h-4"></i>
+      </button>
+      -->
+      <button onclick="toggleTheme()" class="p-1.5 text-secondary hover:text-white transition-colors">
+        <i id="theme-toggle-icon-mob" data-lucide="moon" class="w-4 h-4"></i>
+      </button>
+      <button onclick="toggleSidebar()" class="p-2 text-secondary hover:text-white transition-colors">
+        <i data-lucide="menu" class="w-5 h-5 text-white"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Sub-Header Mode Switcher -->
+  <div id="mobile-mode-bar" class="md:hidden bg-secondary border-b border-border-color px-4 py-1.5 flex justify-center z-20 no-print">
+    <!-- Populated by NavbarComponent -->
+  </div>
+
+  <!-- Mobile Sidebar Backdrop Overlay -->
+  <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden no-print"></div>
+
+  <!-- Left Sidebar (Desktop & Drawer Mobile) -->
+  <aside id="sidebar" class="w-64 bg-secondary border-r border-border-color flex flex-col h-full fixed md:sticky top-0 left-0 -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40 flex-shrink-0 no-print">
+    <!-- Rendered dynamically via NavbarComponent -->
+  </aside>
+
+  <!-- Main Viewport Area -->
+  <main class="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <!-- Main Top Bar -->
+    <header class="h-14 border-b border-border-color bg-secondary/80 backdrop-blur px-6 flex items-center justify-between flex-shrink-0 z-20 no-print">
+      <div class="flex items-center gap-4 flex-1">
+        <div class="relative w-full max-w-xs hidden md:block">
+          <i data-lucide="search" class="w-4 h-4 text-muted absolute left-3 top-2.5"></i>
+          <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Search drawings, materials, tasks..." class="w-full text-xs pl-9 pr-3 py-2 rounded-md border border-border-color bg-primary focus:outline-none">
+          <div id="search-dropdown" class="absolute left-0 right-0 top-11 bg-secondary border border-border-color rounded shadow-2xl hidden z-50 p-2 max-h-64 overflow-y-auto"></div>
+        </div>
+        <div class="md:hidden">
+          <h2 id="page-title" class="text-sm font-semibold tracking-tight text-white font-display">Premio Living OS</h2>
+          <p id="page-subtitle" class="text-[10px] text-secondary mt-0.5">Loading...</p>
+        </div>
+      </div>
+      
+      <!-- Quick Info / Time -->
+      <div class="flex items-center gap-3 text-xs text-secondary">
+        <div class="hidden md:block">
+          <h2 id="desk-page-title" class="text-xs font-semibold text-white font-display text-right">Premio Living OS</h2>
+          <p id="desk-page-subtitle" class="text-[9px] text-muted text-right mt-0.5">Workspace Command</p>
+        </div>
+        
+        <!-- Theme Toggle (Hidden on mobile) -->
+        <button onclick="toggleTheme()" class="hidden md:inline-block p-2 bg-hover hover:bg-border-color border border-border-color rounded text-secondary hover:text-white transition-colors" title="Toggle Light/Dark Theme">
+          <i id="theme-toggle-icon" data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Copilot Button (Hidden for presentation readiness) -->
+        <!--
+        <button onclick="toggleAIDrawer()" class="hidden md:flex px-2.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/20 rounded items-center gap-1.5 text-xs font-medium transition-colors">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          ArchAI Copilot
+        </button>
+        -->
+      </div>
+    </header>
+    
+    <!-- Content Body -->
+    <section id="main-content-container" class="flex-1 p-6 overflow-y-auto">
+      <!-- Dynamically Rendered Content -->
+    </section>
+  </main>
+
+  <!-- ==================== AI ASSISTANT DRAWER ==================== -->
+  <aside id="ai-drawer" class="fixed right-0 top-0 h-full w-96 bg-secondary border-l border-border-color shadow-2xl z-50 flex flex-col translate-x-full transition-transform duration-300 ease-in-out no-print">
+    <!-- Header -->
+    <div class="p-4 border-b border-border-color bg-primary flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <div class="p-1 rounded bg-amber-500/15 text-amber-500">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <h3 class="text-xs font-semibold text-white font-display">ArchAI Copilot</h3>
+          <span class="text-[9px] text-emerald-400 block font-medium">Assistant Active</span>
+        </div>
+      </div>
+      <button onclick="toggleAIDrawer()" class="text-secondary hover:text-white transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    
+    <!-- Messages Body -->
+    <div id="ai-messages" class="flex-1 p-4 overflow-y-auto space-y-4 text-xs">
+      <div class="bg-primary border border-border-color p-3 rounded leading-relaxed text-secondary">
+        Hello Abhilash Reddy, I am your **Premio Living Site Assistant**. 
+        <br><br>
+        I analyze your execution timeline, vendor delay risks, and project margins in real time. 
+        <br><br>
+        <b>Quick AI Workflows:</b>
+        <div class="mt-3 space-y-1.5">
+          <button onclick="triggerAICopilotAction('daily-report')" class="w-full text-left px-2.5 py-1.5 bg-hover hover:bg-border-color rounded text-[10px] text-white flex items-center gap-1.5">
+            <i data-lucide="file-text" class="w-3.5 h-3.5 text-amber-500"></i> Generate Client Daily Report
+          </button>
+          <button onclick="triggerAICopilotAction('delay-predict')" class="w-full text-left px-2.5 py-1.5 bg-hover hover:bg-border-color rounded text-[10px] text-white flex items-center gap-1.5">
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-blue-500"></i> Predict Delivery Delay Risks
+          </button>
+          <!-- Voice & Photo AI triggers commented out for presentation readiness -->
+          <!--
+          <button onclick="openModal('voice-task-modal')" class="w-full text-left px-2.5 py-1.5 bg-hover hover:bg-border-color rounded text-[10px] text-white flex items-center gap-1.5">
+            <i data-lucide="mic" class="w-3.5 h-3.5 text-red-500"></i> Smart Voice-to-Task
+          </button>
+          <button onclick="openModal('ai-photo-defect-modal')" class="w-full text-left px-2.5 py-1.5 bg-hover hover:bg-border-color rounded text-[10px] text-white flex items-center gap-1.5">
+            <i data-lucide="image" class="w-3.5 h-3.5 text-teal-400"></i> AI Photo Issue Detector
+          </button>
+          -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- Input Footer -->
+    <div class="p-3 border-t border-border-color bg-primary flex gap-2">
+      <input type="text" id="ai-input" placeholder="Ask Copilot about projects..." class="flex-1 text-xs p-2 rounded border border-border-color bg-secondary focus:outline-none animate-none">
+      <button onclick="submitAIChat()" class="px-3 bg-amber-500 hover:bg-amber-600 text-black rounded flex items-center justify-center">
+        <i data-lucide="send" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile Bottom Navigation (Hidden on desktop) -->
+  <div id="mobile-bottom-nav" class="md:hidden fixed bottom-0 left-0 w-full z-30 no-print">
+    <!-- Rendered dynamically via NavbarComponent -->
+  </div>
+
+  <!-- Floating Action Button (Global) -->
+  <div class="no-print">
+    <button id="global-fab" onclick="window.QuickActionCenter.open()" class="fab-btn" title="Quick Action Center">
+      <i data-lucide="plus" class="w-6 h-6"></i>
+    </button>
+  </div>
+
+  <!-- ==================== MODAL OVERLAYS ==================== -->
+
+  <!-- 1. Add Project Modal -->
+  <div id="add-project-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-lg rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Create New Project Workspace</h3>
+        <button onclick="closeModal('add-project-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-project-form" class="p-5 space-y-4">
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Project Name</label>
+          <input type="text" id="new-proj-name" required placeholder="e.g. Mr. Anil & Aparna (My Home Nishada)" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Client Name</label>
+          <input type="text" id="new-proj-client" required placeholder="e.g. Mr. Anil & Aparna" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Site Address</label>
+          <input type="text" id="new-proj-location" required placeholder="e.g. Tower 3, Apt 2201, My Home Nishada" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Budget (INR)</label>
+            <input type="number" id="new-proj-budget" required placeholder="e.g. 4500000" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Start Date</label>
+            <input type="text" id="new-proj-start" required placeholder="DD-MM-YYYY" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">End Date</label>
+            <input type="text" id="new-proj-end" required placeholder="DD-MM-YYYY" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('add-project-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Create Workspace</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Add Daily Update Modal -->
+  <div id="add-update-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-2xl rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in max-h-[90vh]">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <div>
+          <h3 class="text-sm font-semibold font-display text-white">Log Daily Site Update</h3>
+          <span id="update-project-title" class="text-[10px] text-secondary"></span>
+        </div>
+        <button onclick="closeModal('add-update-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-update-form" class="p-5 space-y-4 overflow-y-auto flex-1 max-h-[75vh]">
+        
+        <!-- Section A: Date & Labour Counts -->
+        <div class="border-b border-border-color/40 pb-4">
+          <span class="text-[9px] text-amber-500 uppercase font-mono font-bold block mb-2">Section A: General Info & Labour Attendance</span>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Date</label>
+              <input type="text" id="new-update-date" required placeholder="DD-MM-YYYY" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+            </div>
+            <div>
+              <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Total Workers Count</label>
+              <input type="number" id="new-update-workers" required placeholder="e.g. 6" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+            </div>
+          </div>
+          <!-- Labour Breakdown -->
+          <div class="grid grid-cols-5 gap-2 bg-primary/20 p-2 rounded border border-border-color/30">
+            <div>
+              <label class="block text-[8px] text-muted uppercase font-semibold mb-0.5 text-center">Carp</label>
+              <input type="number" id="labour-carpenter" min="0" value="0" class="w-full text-center text-xs p-1 rounded border border-border-color bg-primary text-white">
+            </div>
+            <div>
+              <label class="block text-[8px] text-muted uppercase font-semibold mb-0.5 text-center">Helper</label>
+              <input type="number" id="labour-helper" min="0" value="0" class="w-full text-center text-xs p-1 rounded border border-border-color bg-primary text-white">
+            </div>
+            <div>
+              <label class="block text-[8px] text-muted uppercase font-semibold mb-0.5 text-center">Paint</label>
+              <input type="number" id="labour-painter" min="0" value="0" class="w-full text-center text-xs p-1 rounded border border-border-color bg-primary text-white">
+            </div>
+            <div>
+              <label class="block text-[8px] text-muted uppercase font-semibold mb-0.5 text-center">Elec</label>
+              <input type="number" id="labour-electrician" min="0" value="0" class="w-full text-center text-xs p-1 rounded border border-border-color bg-primary text-white">
+            </div>
+            <div>
+              <label class="block text-[8px] text-muted uppercase font-semibold mb-0.5 text-center">Plumb</label>
+              <input type="number" id="labour-plumber" min="0" value="0" class="w-full text-center text-xs p-1 rounded border border-border-color bg-primary text-white">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section B: Work Completed & Trade Progress Sliders -->
+        <div class="border-b border-border-color/40 pb-4 space-y-3">
+          <span class="text-[9px] text-amber-500 uppercase font-mono font-bold block">Section B: Progress & Trade Status</span>
+          <div>
+            <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Completed Site Work Details Today</label>
+            <textarea id="new-update-completed" required rows="2" placeholder="Describe wood framing, tiling or lighting installation completed..." class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white"></textarea>
+          </div>
+          <div>
+            <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Work In Progress (WIP)</label>
+            <textarea id="new-update-wip" rows="2" placeholder="Describe work currently in progress on site..." class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white"></textarea>
+          </div>
+          <!-- Trade progress sliders -->
+          <div class="bg-primary/20 p-3 rounded border border-border-color/30 space-y-2">
+            <span class="text-[9px] text-secondary uppercase font-bold block mb-1">Active Trades Progress %</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 text-[10px]">
+              <div class="flex justify-between items-center gap-2">
+                <span class="w-20 text-secondary">Carpentry</span>
+                <input type="range" id="trade-carpentry" min="0" max="100" value="0" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+                <span class="w-8 text-right font-mono font-bold text-white">0%</span>
+              </div>
+              <div class="flex justify-between items-center gap-2">
+                <span class="w-20 text-secondary">Electrical</span>
+                <input type="range" id="trade-electrical" min="0" max="100" value="0" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+                <span class="w-8 text-right font-mono font-bold text-white">0%</span>
+              </div>
+              <div class="flex justify-between items-center gap-2">
+                <span class="w-20 text-secondary">Painting</span>
+                <input type="range" id="trade-painting" min="0" max="100" value="0" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+                <span class="w-8 text-right font-mono font-bold text-white">0%</span>
+              </div>
+              <div class="flex justify-between items-center gap-2">
+                <span class="w-20 text-secondary">False Ceiling</span>
+                <input type="range" id="trade-falseCeiling" min="0" max="100" value="0" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+                <span class="w-8 text-right font-mono font-bold text-white">0%</span>
+              </div>
+              <div class="flex justify-between items-center gap-2">
+                <span class="w-20 text-secondary">Stone</span>
+                <input type="range" id="trade-stone" min="0" max="100" value="0" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+                <span class="w-8 text-right font-mono font-bold text-white">0%</span>
+              </div>
+              <div class="flex justify-between items-center gap-2">
+                <span class="w-20 text-secondary">Glass</span>
+                <input type="range" id="trade-glass" min="0" max="100" value="0" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+                <span class="w-8 text-right font-mono font-bold text-white">0%</span>
+              </div>
+              <div class="flex justify-between items-center gap-2">
+                <span class="w-20 text-secondary">Modular</span>
+                <input type="range" id="trade-modular" min="0" max="100" value="0" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+                <span class="w-8 text-right font-mono font-bold text-white">0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section C: Material Status & Snag Register -->
+        <div class="border-b border-border-color/40 pb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Material Status -->
+          <div class="space-y-2">
+            <span class="text-[9px] text-amber-500 uppercase font-mono font-bold block">Section C: Material Status</span>
+            <div class="bg-primary/20 p-2.5 rounded border border-border-color/30 space-y-2 max-h-40 overflow-y-auto">
+              <div class="flex flex-col gap-1.5" id="update-material-status-container">
+                <!-- Dynamically populated via JavaScript -->
+              </div>
+            </div>
+          </div>
+          <!-- Snag Register -->
+          <div class="space-y-2">
+            <span class="text-[9px] text-amber-500 uppercase font-mono font-bold block">Section D: Issue & Snag Register</span>
+            <div class="bg-primary/20 p-2.5 rounded border border-border-color/30 space-y-2">
+              <div>
+                <label class="block text-[8px] text-muted uppercase font-semibold">New Issue Description</label>
+                <input type="text" id="update-snag-issue" placeholder="e.g. Wardrobe sliding bubble" class="w-full text-xs p-1.5 rounded border border-border-color bg-primary text-white focus:outline-none">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[8px] text-muted uppercase font-semibold">Responsible Trade</label>
+                  <input type="text" id="update-snag-resp" placeholder="e.g. Wood Crafts" class="w-full text-xs p-1.5 rounded border border-border-color bg-primary text-white focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[8px] text-muted uppercase font-semibold">Target Resolve Date</label>
+                  <input type="date" id="update-snag-target" class="w-full text-[10px] p-1 rounded border border-border-color bg-primary text-white focus:outline-none">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section D: Tomorrow Action Plan & Delay Reporting -->
+        <div class="border-b border-border-color/40 pb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Tomorrow checklist -->
+          <div class="space-y-2">
+            <span class="text-[9px] text-amber-500 uppercase font-mono font-bold block">Section E: Tomorrow Action Plan</span>
+            <div>
+              <label class="block text-[8px] text-muted uppercase font-semibold mb-1">Tomorrow's Execution Plan Description</label>
+              <textarea id="new-update-tomorrow-plan" rows="2" placeholder="Describe tomorrow's execution plan..." class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-[8px] text-muted uppercase font-semibold mb-1">Enter Tomorrow Actions (comma separated)</label>
+              <input type="text" id="new-update-tomorrow-checklist" placeholder="e.g. Align tv framing, Install drawer tracks" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none">
+            </div>
+            <div class="text-[8px] text-muted">Separate checklist items with commas.</div>
+          </div>
+          <!-- Delay Reporting -->
+          <div class="space-y-2">
+            <span class="text-[9px] text-amber-500 uppercase font-mono font-bold block">Section F: Delay Reporting</span>
+            <div class="bg-primary/20 p-2.5 rounded border border-border-color/30 space-y-2">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[8px] text-muted uppercase font-semibold">Delay Type</label>
+                  <select id="update-delay-type" class="w-full text-xs p-1 rounded border border-border-color bg-primary text-white focus:outline-none">
+                    <option value="">-- No Delay --</option>
+                    <option value="Design Delay">Design Delay</option>
+                    <option value="Client Delay">Client Delay</option>
+                    <option value="Vendor Delay">Vendor Delay</option>
+                    <option value="Material Delay">Material Delay</option>
+                    <option value="Labour Delay">Labour Delay</option>
+                    <option value="Site Delay">Site Delay</option>
+                    <option value="Payment Delay">Payment Delay</option>
+                    <option value="Approval Delay">Approval Delay</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[8px] text-muted uppercase font-semibold">Owner Responsible</label>
+                  <input type="text" id="update-delay-owner" placeholder="e.g. Client" class="w-full text-xs p-1 rounded border border-border-color bg-primary text-white focus:outline-none">
+                </div>
+              </div>
+              <div>
+                <label class="block text-[8px] text-muted uppercase font-semibold">Delay Reason</label>
+                <input type="text" id="update-delay-reason" placeholder="e.g. Client approval pending on marble lot" class="w-full text-xs p-1.5 rounded border border-border-color bg-primary text-white focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-[8px] text-muted uppercase font-semibold">Expected Resolution Date</label>
+                <input type="date" id="update-delay-res-date" class="w-full text-[10px] p-1 rounded border border-border-color bg-primary text-white focus:outline-none">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section E2 & E3: Material Delivery & Supervisor -->
+        <div class="border-b border-border-color/40 pb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <span class="text-[9px] text-amber-500 uppercase font-mono font-bold block mb-2">Section E2: Material Delivery Logs</span>
+            <div class="space-y-2">
+              <div>
+                <label class="block text-[8px] text-muted uppercase font-semibold mb-0.5">Material Received Today</label>
+                <input type="text" id="update-mat-received" placeholder="e.g. 5 boxes Teak Veneer, 2 bags grout" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-[8px] text-muted uppercase font-semibold mb-0.5">Material Pending / Delayed</label>
+                <input type="text" id="update-mat-pending" placeholder="e.g. Kitchen Quartz slabs delayed" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none">
+              </div>
+            </div>
+          </div>
+          <div>
+            <span class="text-[9px] text-amber-500 uppercase font-mono font-bold block mb-2">Section E3: Site Responsibility</span>
+            <div>
+              <label class="block text-[8px] text-muted uppercase font-semibold mb-1">Responsible Person / Supervisor</label>
+              <input type="text" id="update-supervisor" placeholder="e.g. Rajesh Nair (Site Lead)" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Photos -->
+        <div>
+          <span class="text-[9px] text-amber-500 uppercase font-mono font-bold block mb-1">Section G: Progress Photo & Remarks</span>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-primary/10 p-2.5 rounded border border-border-color/30">
+            <div>
+              <label class="block text-[9px] text-secondary font-semibold mb-0.5">Attach Photo</label>
+              <input type="file" id="new-update-photo-file" accept="image/*" class="w-full text-xs p-1.5 rounded border border-border-color bg-primary text-white">
+              <div id="new-update-photo-preview" class="mt-2 hidden">
+                <img id="new-update-photo-img" src="" class="max-w-full max-h-24 rounded border border-border-color object-contain">
+              </div>
+            </div>
+            <div class="space-y-2">
+              <div>
+                <label class="block text-[8px] text-muted uppercase font-semibold">Area / Element Label</label>
+                <input type="text" id="update-photo-area" placeholder="e.g. Living room wall paneling" class="w-full text-xs p-1.5 rounded border border-border-color bg-primary text-white focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-[8px] text-muted uppercase font-semibold">Remarks</label>
+                <input type="text" id="update-photo-remarks" placeholder="e.g. Frame complete, ready for veneer pasting" class="w-full text-xs p-1.5 rounded border border-border-color bg-primary text-white focus:outline-none">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex justify-end gap-2 border-t border-border-color pt-3 mt-4">
+          <button type="button" onclick="closeModal('add-update-modal')" class="px-3.5 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Save Update Log</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Add Snag Modal -->
+  <div id="add-snag-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-lg rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Add Snag & Issue Card</h3>
+        <button onclick="closeModal('add-snag-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-snag-form" class="p-5 space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Site Area / Room</label>
+            <input type="text" id="new-snag-area" required placeholder="e.g. Kitchen" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Priority</label>
+            <select id="new-snag-priority" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Issue Description</label>
+          <textarea id="new-snag-desc" required rows="3" placeholder="Describe the defect in detail (e.g. Veneer bubble)" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Assign Vendor</label>
+            <select id="new-snag-assignee" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+              <!-- Dynamically Populated Vendors -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Resolution Deadline</label>
+            <input type="text" id="new-snag-deadline" required placeholder="DD-MM-YYYY" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('add-snag-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Create Snag Card</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Add Material Modal -->
+  <div id="add-material-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-lg rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Add Material Selection Row</h3>
+        <button onclick="closeModal('add-material-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-material-form" class="p-5 space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Material Name</label>
+            <input type="text" id="new-mat-name" required placeholder="e.g. Premium Teak Veneer" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Brand</label>
+            <input type="text" id="new-mat-brand" required placeholder="e.g. Decowood" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Finish/Color Code</label>
+            <input type="text" id="new-mat-code" required placeholder="e.g. TK-9081 Premium" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Supplier Rate</label>
+            <input type="number" id="new-mat-rate" required placeholder="Rate in INR" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Vendor Provider</label>
+          <select id="new-mat-vendor" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+            <!-- Dynamically Populated Vendors -->
+          </select>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Notes</label>
+          <input type="text" id="new-mat-notes" placeholder="e.g. For formal living room wall paneling" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('add-material-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Add to Selection Tracker</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Add BOQ Item Modal -->
+  <div id="add-boq-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-lg rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Add BOQ Module Item</h3>
+        <button onclick="closeModal('add-boq-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-boq-form" class="p-5 space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Module Category</label>
+            <select id="new-boq-category" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+              <option value="Civil">Civil</option>
+              <option value="Carpentry">Carpentry</option>
+              <option value="Electrical">Electrical</option>
+              <option value="False ceiling">False ceiling</option>
+              <option value="Paint">Paint</option>
+              <option value="Hardware">Hardware</option>
+              <option value="Kitchen">Kitchen</option>
+              <option value="Wardrobes">Wardrobes</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Item Description</label>
+            <input type="text" id="new-boq-desc" required placeholder="e.g. Veneer paneling in Living room" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+        </div>
+        <div class="grid grid-cols-4 gap-2">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Qty</label>
+            <input type="number" id="new-boq-qty" required placeholder="e.g. 100" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white col-span-1">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Rate</label>
+            <input type="number" id="new-boq-rate" required placeholder="e.g. 350" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white col-span-1">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Margin (%)</label>
+            <input type="number" id="new-boq-margin" required placeholder="e.g. 18" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white col-span-1">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">GST (%)</label>
+            <input type="number" id="new-boq-gst" required placeholder="18" value="18" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white col-span-1">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('add-boq-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Add to BOQ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. Add Invoice Modal -->
+  <div id="add-invoice-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-lg rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Raise Payment Milestone Invoice</h3>
+        <button onclick="closeModal('add-invoice-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-invoice-form" class="p-5 space-y-4">
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Milestone Type / Title</label>
+          <input type="text" id="new-inv-milestone" required placeholder="e.g. Carpentry Inception Milestone" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Invoice Amount (INR)</label>
+            <input type="number" id="new-inv-amount" required placeholder="Milestone value" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Invoice Date</label>
+            <input type="text" id="new-inv-date" required placeholder="DD-MM-YYYY" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('add-invoice-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Create Invoice</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. Add Vendor Modal -->
+  <div id="add-vendor-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-lg rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Register Global Partner Vendor</h3>
+        <button onclick="closeModal('add-vendor-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-vendor-form" class="p-5 space-y-4">
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Vendor Agency / Name</label>
+          <input type="text" id="new-v-name" required placeholder="e.g. Royal Stones" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Work Category</label>
+            <select id="new-v-category" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+              <option value="Modular Works (Carcase & Shutters)">Modular Works (Carcase & Shutters)</option>
+              <option value="Carpentry & Framing">Carpentry & Framing</option>
+              <option value="Stone, Marble & Granite">Stone, Marble & Granite</option>
+              <option value="Quartz & Countertops">Quartz & Countertops</option>
+              <option value="Civil & Brick Masonry">Civil & Brick Masonry</option>
+              <option value="False Ceiling (Gypsum/Grid)">False Ceiling (Gypsum/Grid)</option>
+              <option value="Electrical, Track Lights & Automation">Electrical, Track Lights & Automation</option>
+              <option value="Plumbing & Sanitary Sourcing">Plumbing & Sanitary Sourcing</option>
+              <option value="Glass & Mirror Works">Glass & Mirror Works</option>
+              <option value="Painting & Putty">Painting & Putty</option>
+              <option value="Wood Polishing (PU/Melamine/Deco)">Wood Polishing (PU/Melamine/Deco)</option>
+              <option value="Plywood, MDF & HDHMR Sourcing">Plywood, MDF & HDHMR Sourcing</option>
+              <option value="Veneers & Fluted Panels">Veneers & Fluted Panels</option>
+              <option value="Laminates & Acrylic Slabs">Laminates & Acrylic Slabs</option>
+              <option value="Hardware, Hinges & Tandem Boxes">Hardware, Hinges & Tandem Boxes</option>
+              <option value="Kitchen Appliances & Sinks">Kitchen Appliances & Sinks</option>
+              <option value="Wallpaper, Cladding & PVC Panels">Wallpaper, Cladding & PVC Panels</option>
+              <option value="Furnishings, Curtains & Upholstery">Furnishings, Curtains & Upholstery</option>
+              <option value="Metal Works & Fabrication">Metal Works & Fabrication</option>
+              <option value="Other Interior Works">Other Interior Works</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Phone Number</label>
+            <input type="text" id="new-v-phone" required placeholder="e.g. +91 98480 12345" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Estimated Delivery Delay Risk</label>
+          <select id="new-v-delay" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+            <option value="Low">Low Risk</option>
+            <option value="Medium">Medium Risk</option>
+            <option value="High">High Risk</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('add-vendor-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Register Vendor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. Add Document Modal -->
+  <div id="add-document-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-sm rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Upload to Vault</h3>
+        <button onclick="closeModal('add-document-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-document-form" class="p-5 space-y-4">
+        <div id="doc-project-group" class="hidden">
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Select Project / Site</label>
+          <select id="new-doc-project" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Document Category</label>
+          <select id="new-doc-folder" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+            <option value="drawings">Design & Layouts</option>
+            <option value="agreements">Contracts & Agreements</option>
+            <option value="quotations">Quotations & BOQs</option>
+            <option value="invoices">Invoices & Receipts</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Select File</label>
+          <input type="file" id="new-doc-file" class="w-full text-xs p-1 text-white border border-border-color bg-primary rounded cursor-pointer file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-semibold file:bg-amber-500 file:text-black hover:file:bg-amber-600">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Document File Name</label>
+          <input type="text" id="new-doc-name" required placeholder="e.g. Master Bedroom Ceiling Elevation.pdf" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('add-document-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Upload Document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 11. Edit Stage Modal -->
+  <div id="edit-stage-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-md rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Edit Activity / Stage Details</h3>
+        <button onclick="closeModal('edit-stage-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="edit-stage-form" class="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
+        <input type="hidden" id="edit-stage-original-name">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Project</label>
+            <input type="text" id="edit-stage-project" readonly class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white opacity-60">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Stage / Group</label>
+            <input type="text" id="edit-stage-group" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Activity Name</label>
+          <input type="text" id="edit-stage-name" required class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Owner / Responsible</label>
+            <input type="text" id="edit-stage-owner" placeholder="e.g. S. Kumar" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Status</label>
+            <select id="edit-stage-status" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+              <option value="Not Started">Not Started</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Blocked">Blocked</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Progress (%)</label>
+            <input type="number" id="edit-stage-progress" min="0" max="100" required class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Dependency / Blocked By</label>
+            <input type="text" id="edit-stage-dependency" placeholder="e.g. Client Approval" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Start Date</label>
+            <input type="text" id="edit-stage-start" placeholder="YYYY-MM-DD" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Target Due Date</label>
+            <input type="text" id="edit-stage-deadline" placeholder="YYYY-MM-DD" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Remarks & Notes</label>
+          <textarea id="edit-stage-reason" rows="2" placeholder="Remarks or delay reason..." class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500 resize-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Last Updated Date</label>
+          <input type="text" id="edit-stage-updated" readonly class="w-full text-[10px] p-2 rounded border border-border-color bg-primary text-secondary opacity-60">
+        </div>
+        <div class="flex justify-end gap-1.5 border-t border-border-color pt-4 mt-6 flex-wrap">
+          <button type="button" onclick="window.ModalComponent.deleteStageActivity()" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded transition-colors mr-auto">Delete</button>
+          <button type="button" onclick="closeModal('edit-stage-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="button" onclick="window.ModalComponent.reopenStage()" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded transition-colors">Reopen</button>
+          <button type="button" onclick="window.ModalComponent.markStageComplete()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded transition-colors">Mark Complete</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Save Details</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 12. Add/Edit Delivery Modal -->
+  <div id="add-delivery-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-lg rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Add Delivery Log</h3>
+        <button onclick="closeModal('add-delivery-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-delivery-form" class="p-5 space-y-4">
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Item Description</label>
+          <input type="text" id="new-del-item" required placeholder="e.g. Blum Wardrobe Soft hinges" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Quantity</label>
+            <input type="text" id="new-del-qty" required placeholder="e.g. 32 Pcs" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Expected Date</label>
+            <input type="text" id="new-del-date" required placeholder="DD-MM-YYYY" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Status</label>
+          <select id="new-del-status" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+            <option value="Pending">Pending</option>
+            <option value="Delivered">Delivered</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('add-delivery-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Save Delivery Log</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 13. Add/Edit Site Visit Modal -->
+  <div id="add-visit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-lg rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Add Site Visit</h3>
+        <button onclick="closeModal('add-visit-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-visit-form" class="p-5 space-y-4">
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Visitor Name & Role</label>
+          <input type="text" id="new-vis-visitor" required placeholder="e.g. S. Kumar (Architect)" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Purpose of Visit</label>
+          <input type="text" id="new-vis-purpose" required placeholder="e.g. Plastering check" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Date</label>
+            <input type="text" id="new-vis-date" required placeholder="DD-MM-YYYY" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Time</label>
+            <input type="text" id="new-vis-time" required placeholder="e.g. 11:00 AM" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('add-visit-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Save Site Visit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 14. WhatsApp Role-Target Share Modal -->
+  <div id="whatsapp-share-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-55 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-xs rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in text-center p-5">
+      <div class="w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="phone-call" class="w-6 h-6"></i>
+      </div>
+      <h4 class="text-sm font-semibold text-white mb-1">Select WhatsApp Recipient</h4>
+      <p class="text-[10px] text-secondary mb-4 leading-normal">
+        Choose a target profile to dispatch this update with a tailored text template.
+      </p>
+      <div class="flex flex-col gap-2">
+        <button onclick="window.WhatsAppService.dispatchToRole('client')" class="w-full py-2 bg-hover hover:bg-border-color text-xs rounded border border-border-color/30 text-white flex items-center justify-center gap-1.5">
+          <i data-lucide="user" class="w-3.5 h-3.5 text-amber-500"></i> <span>Share to Client</span>
+        </button>
+        <button onclick="window.WhatsAppService.dispatchToRole('md')" class="w-full py-2 bg-hover hover:bg-border-color text-xs rounded border border-border-color/30 text-white flex items-center justify-center gap-1.5">
+          <i data-lucide="briefcase" class="w-3.5 h-3.5 text-purple-400"></i> <span>Share to MD Sir</span>
+        </button>
+        <button onclick="window.WhatsAppService.dispatchToRole('vendor')" class="w-full py-2 bg-hover hover:bg-border-color text-xs rounded border border-border-color/30 text-white flex items-center justify-center gap-1.5">
+          <i data-lucide="wrench" class="w-3.5 h-3.5 text-cyan-400"></i> <span>Share to Vendor</span>
+        </button>
+        <button onclick="window.WhatsAppService.dispatchToRole('team')" class="w-full py-2 bg-hover hover:bg-border-color text-xs rounded border border-border-color/30 text-white flex items-center justify-center gap-1.5">
+          <i data-lucide="users" class="w-3.5 h-3.5 text-blue-400"></i> <span>Share to Team</span>
+        </button>
+      </div>
+      <button onclick="closeModal('whatsapp-share-modal')" class="mt-4 text-xs text-secondary hover:text-white underline">Cancel</button>
+    </div>
+  </div>
+
+  <!-- 9. Voice-to-Task Simulator Modal -->
+  <div id="voice-task-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-md rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-amber-500 flex items-center gap-1.5">
+          <i data-lucide="mic" class="w-4 h-4"></i> Voice-to-Task Parser
+        </h3>
+        <button onclick="closeModal('voice-task-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-4">
+        <p class="text-xs text-secondary leading-relaxed">
+          Simulate a site engineer recording a voice note. The AI will parse the speech structure and create a **Snag Card** automatically.
+        </p>
+        <div class="bg-primary p-3 rounded border border-border-color text-xs">
+          <span class="text-muted block text-[10px] uppercase font-semibold mb-1">Select Speech Template</span>
+          <select id="voice-template" class="w-full p-2 bg-secondary border border-border-color text-white text-xs rounded focus:outline-none" onchange="document.getElementById('voice-transcription').value = this.value">
+            <option value="Under-sink cabinet door hinge rubbing against panel in kitchen. Mark high priority for carpenter Wood Crafts target Monday.">Under-sink cabinet door hinge rubbing in Kitchen (High prio/Carpenter)</option>
+            <option value="Lobby paneling teak veneer has a bubble in the center section. Target date next Friday, assign to Wood Crafts as medium priority snag.">Lobby paneling teak veneer bubble (Medium prio/Carpenter)</option>
+            <option value="Incorrect light channel layout in corridor. Needs tracking line realignment by electrical team by June 5.">Incorrect light channel in Corridor (Low prio/Electrical)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Live Transcription Preview</label>
+          <textarea id="voice-transcription" rows="3" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">Under-sink cabinet door hinge rubbing against panel in kitchen. Mark high priority for carpenter Wood Crafts target Monday.</textarea>
+        </div>
+        <div class="flex justify-between items-center border-t border-border-color pt-4 mt-4">
+          <span class="text-[10px] text-emerald-400 flex items-center gap-1"><i data-lucide="radio" class="w-3.5 h-3.5 animate-pulse"></i> Ready to parse</span>
+          <div class="flex gap-2">
+            <button onclick="closeModal('voice-task-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+            <button onclick="handleVoiceTaskParse()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors flex items-center gap-1">
+              <i data-lucide="wand-2" class="w-3.5 h-3.5"></i> Parse Speech
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. AI Site Defect Detector Modal -->
+  <div id="ai-photo-defect-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-md rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-amber-500 flex items-center gap-1.5">
+          <i data-lucide="eye" class="w-4 h-4"></i> AI Photo Issue Detector
+        </h3>
+        <button onclick="closeModal('ai-photo-defect-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-4">
+        <p class="text-xs text-secondary leading-relaxed">
+          Simulate uploading a progress photo to let AI scan for visible snags (e.g. alignment issues, paint cracks, veneer bubbles).
+        </p>
+        
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="selectAIPhotoSample('kitchen')" class="p-2 border border-border-color bg-primary rounded hover:border-amber-500 text-center">
+            <div class="w-full h-12 bg-cover bg-center rounded mb-1" style="background-image: url('https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=100')"></div>
+            <span class="text-[9px] text-white font-medium">Kitchen</span>
+          </button>
+          <button onclick="selectAIPhotoSample('paint')" class="p-2 border border-border-color bg-primary rounded hover:border-amber-500 text-center">
+            <div class="w-full h-12 bg-cover bg-center rounded mb-1" style="background-image: url('https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=100')"></div>
+            <span class="text-[9px] text-white font-medium">Living Wall</span>
+          </button>
+          <button onclick="selectAIPhotoSample('tile')" class="p-2 border border-border-color bg-primary rounded hover:border-amber-500 text-center">
+            <div class="w-full h-12 bg-cover bg-center rounded mb-1" style="background-image: url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=100')"></div>
+            <span class="text-[9px] text-white font-medium">Tiling</span>
+          </button>
+        </div>
+        
+        <div id="ai-photo-preview" class="w-full h-40 rounded border border-border-color bg-primary flex flex-col items-center justify-center relative overflow-hidden">
+          <i data-lucide="image" class="w-8 h-8 text-muted mb-2"></i>
+          <span class="text-xs text-muted">Select sample photo above</span>
+        </div>
+        
+        <div id="ai-detection-results" class="hidden p-3 rounded bg-primary border border-border-color text-xs space-y-2">
+          <!-- Populated by scan -->
+        </div>
+
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-4">
+          <button type="button" onclick="closeModal('ai-photo-defect-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Close</button>
+          <button id="ai-scan-btn" disabled onclick="runAISitePhotoScan()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500/50 disabled:cursor-not-allowed text-black text-xs font-semibold rounded transition-colors flex items-center gap-1.5">
+            <i data-lucide="scan" class="w-3.5 h-3.5"></i> Run AI Scan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       PURCHASE ORDER CREATE / EDIT MODAL
+  ====================================================== -->
+  <div id="po-create-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onclick="if(event.target===this)window.POPage.closeCreateModal()">
+    <div class="bg-secondary border border-border-color rounded-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-2xl">
+      <div class="sticky top-0 bg-secondary border-b border-border-color p-5 flex items-center justify-between z-10 rounded-t-2xl">
+        <div>
+          <h2 class="text-sm font-bold text-white font-display flex items-center gap-2">
+            <i data-lucide="clipboard-signature" class="w-4 h-4 text-amber-500"></i>
+            <span id="po-modal-title">Create Purchase Order</span>
+          </h2>
+          <p class="text-[10px] text-muted mt-0.5">Fill all details and line items below</p>
+        </div>
+        <button onclick="window.POPage.closeCreateModal()" class="p-2 bg-hover hover:bg-border-color border border-border-color rounded text-secondary hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-5">
+        <input type="hidden" id="po-edit-id">
+
+        <!-- PO Number + Project -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">PO Number</label>
+            <input type="text" id="po-number-field" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-amber-500 font-mono font-bold focus:outline-none focus:border-amber-500" readonly>
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Link to Project</label>
+            <select id="po-project" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500"></select>
+          </div>
+        </div>
+
+        <!-- Vendor Section -->
+        <div class="border border-border-color/40 rounded-lg p-3 space-y-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="wrench" class="w-3.5 h-3.5 text-amber-500"></i>
+            <span class="text-[10px] text-muted uppercase font-semibold">Vendor / Supplier</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Quick Select</label>
+              <select id="po-vendor-select" onchange="window.POPage.onVendorSelect(this.value)" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500"></select>
+            </div>
+            <div>
+              <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Vendor Name</label>
+              <input type="text" id="po-vendor-name" placeholder="Enter vendor name" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Phone Number</label>
+              <input type="text" id="po-vendor-phone" placeholder="+91 98480 00000" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white font-mono focus:outline-none focus:border-amber-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Line Items -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] text-muted uppercase font-semibold flex items-center gap-1.5">
+              <i data-lucide="list" class="w-3.5 h-3.5 text-amber-500"></i> Material Line Items
+            </span>
+            <button type="button" onclick="window.POPage.addItem()" class="px-2.5 py-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-500 text-[10px] font-bold rounded border border-amber-500/20 flex items-center gap-1">
+              <i data-lucide="plus" class="w-3 h-3"></i> Add Item
+            </button>
+          </div>
+          <div id="po-items-list" class="space-y-2"></div>
+        </div>
+
+        <!-- Charges + GST -->
+        <div class="border border-border-color/40 rounded-lg p-3 space-y-3">
+          <span class="text-[10px] text-muted uppercase font-semibold block">Financial Details</span>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[9px] text-muted uppercase font-semibold mb-1">GST %</label>
+              <input type="number" id="po-gst" min="0" max="28" value="18" oninput="window.POPage.recalcModalTotals()" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Additional Charges (₹)</label>
+              <input type="number" id="po-additional-charges" min="0" value="0" oninput="window.POPage.recalcModalTotals()" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Delivery Date</label>
+              <input type="text" id="po-delivery-date" placeholder="DD-MM-YYYY" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+            </div>
+          </div>
+
+          <!-- Totals Summary -->
+          <div class="bg-primary/40 rounded p-3 space-y-1.5 text-xs border border-border-color/30">
+            <div class="flex justify-between"><span class="text-secondary">Subtotal</span><span id="po-subtotal-display" class="font-mono text-white">₹0</span></div>
+            <div class="flex justify-between"><span class="text-secondary">GST Amount</span><span id="po-gst-display" class="font-mono text-white">₹0</span></div>
+            <div class="flex justify-between"><span class="text-secondary">Additional</span><span id="po-addl-display" class="font-mono text-white">₹0</span></div>
+            <div class="flex justify-between border-t border-border-color pt-1.5">
+              <span class="font-bold text-white">Grand Total</span>
+              <span id="po-grand-display" class="font-mono font-bold text-amber-500 text-sm">₹0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes + Confirmation -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Notes / Instructions</label>
+            <textarea id="po-notes" rows="3" placeholder="Special instructions, finish details, packing notes..." class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500 resize-none"></textarea>
+          </div>
+          <div class="flex items-start gap-2 pt-5">
+            <input type="checkbox" id="po-vendor-confirmed" class="accent-amber-500 mt-0.5 w-4 h-4">
+            <div>
+              <label for="po-vendor-confirmed" class="text-xs text-white font-semibold cursor-pointer">Vendor Confirmed</label>
+              <p class="text-[10px] text-muted mt-0.5">Check if the vendor has verbally or in writing confirmed this order.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-3 border-t border-border-color pt-4">
+          <button type="button" onclick="window.POPage.closeCreateModal()" class="px-4 py-2 bg-hover hover:bg-border-color border border-border-color text-white text-xs rounded transition-colors">Cancel</button>
+          <button type="button" onclick="window.POPage.savePO()" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs rounded flex items-center gap-1.5 transition-all hover:scale-105">
+            <i data-lucide="save" class="w-3.5 h-3.5"></i> Save Purchase Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       SUPABASE DATABASE CONNECTION MODAL
+  ====================================================== -->
+  <div id="connect-supabase-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-md rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <div class="flex items-center gap-2">
+          <i data-lucide="settings" class="w-4 h-4 text-amber-500"></i>
+          <h3 class="text-sm font-semibold font-display text-white">System Settings & Database</h3>
+        </div>
+        <button onclick="closeModal('connect-supabase-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="connect-supabase-form" class="p-5 space-y-4">
+        <p class="text-xs text-secondary leading-normal">
+          Configure company contact details, branding logo, and connect your Supabase DB for backup and syncing.
+        </p>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Project URL (Optional)</label>
+          <input type="url" id="supabase-connect-url" placeholder="https://your-project.supabase.co" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white font-mono focus:outline-none focus:border-amber-500">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Anon API Key (Optional)</label>
+          <input type="password" id="supabase-connect-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX..." class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white font-mono focus:outline-none focus:border-amber-500">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Company Contact Phone</label>
+          <input type="text" id="company-contact-phone" placeholder="+91 98480 00000" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white font-mono focus:outline-none focus:border-amber-500">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1 block mb-1">Company Logo</label>
+          <div class="flex items-center gap-3">
+            <label class="px-3 py-2 bg-primary hover:bg-hover border border-border-color rounded text-xs text-white font-semibold cursor-pointer flex items-center gap-1.5 transition-all">
+              <i data-lucide="upload" class="w-3.5 h-3.5 text-amber-500"></i> Select Logo Image
+              <input type="file" id="company-logo-file" accept="image/*" class="hidden">
+            </label>
+            <div id="company-logo-preview-container" class="hidden flex items-center gap-2">
+              <img id="company-logo-preview-img" src="" class="h-8 w-12 object-contain border border-border-color rounded bg-white/5">
+              <button type="button" onclick="window.ModalComponent.deleteCompanyLogo()" class="text-rose-500 hover:text-rose-400 font-extrabold text-sm" title="Remove Logo">✕</button>
+            </div>
+          </div>
+          <span class="text-[9px] text-muted mt-1 block">Maximum 1.5MB. PNG/JPG format recommended.</span>
+        </div>
+        
+        <!-- Data Migration & Backup Utilities -->
+        <div class="border-t border-border-color/60 pt-4 space-y-3">
+          <span class="text-[10px] text-muted uppercase font-semibold block">Data Migration & Backup</span>
+          <div class="grid grid-cols-1 gap-2">
+            <button type="button" onclick="window.ModalComponent.runDataMigration()" class="w-full py-2 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 text-amber-500 text-xs font-semibold rounded flex items-center justify-center gap-1.5 transition-all">
+              <i data-lucide="database" class="w-4 h-4"></i> Migrate Local Data
+            </button>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="window.ModalComponent.exportBackup()" class="py-2 bg-hover hover:bg-border-color border border-border-color/60 text-xs text-white rounded flex items-center justify-center gap-1.5 transition-all">
+                <i data-lucide="download" class="w-3.5 h-3.5 text-amber-500"></i> Export Backup
+              </button>
+              <label class="py-2 bg-hover hover:bg-border-color border border-border-color/60 text-xs text-white rounded flex items-center justify-center gap-1.5 transition-all cursor-pointer text-center">
+                <i data-lucide="upload" class="w-3.5 h-3.5 text-amber-500"></i> Import Backup
+                <input type="file" id="backup-import-file" accept=".json" class="hidden" onchange="window.ModalComponent.importBackup(this.files)">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('connect-supabase-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       PURCHASE ORDER WHATSAPP SHARE MODAL
+  ====================================================== -->
+  <div id="po-share-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onclick="if(event.target===this){this.classList.add('hidden');this.classList.remove('flex')}">
+    <div class="bg-secondary border border-border-color rounded-2xl w-full max-w-sm shadow-2xl p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-white flex items-center gap-2">
+          <i data-lucide="phone" class="w-4 h-4 text-emerald-400"></i> Share via WhatsApp
+        </h2>
+        <button onclick="this.closest('#po-share-modal').classList.add('hidden');this.closest('#po-share-modal').classList.remove('flex')" class="p-1.5 bg-hover border border-border-color rounded text-secondary hover:text-white">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+      <p class="text-xs text-secondary">Select the recipient to send this Purchase Order summary:</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="window.POPage.shareWhatsAppTo(window.POPage._pendingSharePoId,'vendor')" class="py-3 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 text-xs font-bold rounded border border-emerald-500/20 flex flex-col items-center justify-center gap-1.5">
+          <i data-lucide="wrench" class="w-5 h-5"></i> Vendor
+        </button>
+        <button onclick="window.POPage.shareWhatsAppTo(window.POPage._pendingSharePoId,'site')" class="py-3 bg-hover hover:bg-border-color text-secondary text-xs font-bold rounded border border-border-color/30 flex flex-col items-center justify-center gap-1.5 hover:text-white">
+          <i data-lucide="hard-hat" class="w-5 h-5"></i> Site Team
+        </button>
+        <button onclick="window.POPage.shareWhatsAppTo(window.POPage._pendingSharePoId,'client')" class="py-3 bg-hover hover:bg-border-color text-secondary text-xs font-bold rounded border border-border-color/30 flex flex-col items-center justify-center gap-1.5 hover:text-white">
+          <i data-lucide="user" class="w-5 h-5"></i> Client
+        </button>
+        <button onclick="window.POPage.shareWhatsAppTo(window.POPage._pendingSharePoId,'md')" class="py-3 bg-hover hover:bg-border-color text-secondary text-xs font-bold rounded border border-border-color/30 flex flex-col items-center justify-center gap-1.5 hover:text-white">
+          <i data-lucide="briefcase" class="w-5 h-5"></i> MD Sir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       UPGRADED SITE DASHBOARD DRILL-DOWN MODALS
+  ====================================================== -->
+
+  <!-- 1. Edit Dependency Modal -->
+  <div id="edit-dependency-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-lg rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in max-h-[90vh]">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <div>
+          <h3 class="text-sm font-semibold font-display text-white">Edit Project Dependency</h3>
+          <span id="edit-dep-project-title" class="text-[10px] text-secondary font-medium"></span>
+        </div>
+        <button onclick="closeModal('edit-dependency-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="edit-dep-form" class="p-5 space-y-4 overflow-y-auto flex-1 max-h-[75vh]">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Status</label>
+            <select id="edit-dep-status" required class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+              <option value="Not Started">Not Started</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Blocked">Blocked</option>
+              <option value="Overdue">Overdue</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Dependency Name</label>
+            <input type="text" id="edit-dep-name" required class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Blocked By</label>
+            <input type="text" id="edit-dep-blocked" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Owner</label>
+            <input type="text" id="edit-dep-owner" required class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Target Date</label>
+            <input type="date" id="edit-dep-target" required class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Resolution Date</label>
+            <input type="date" id="edit-dep-resolution-date" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+        <!-- Impact Calculations -->
+        <div class="grid grid-cols-2 gap-3 text-center bg-primary/20 p-2.5 rounded border border-border-color/30">
+          <div>
+            <span class="text-[9px] text-muted block uppercase font-bold">Estimated Delay Impact</span>
+            <span id="edit-dep-time-impact" class="text-xs font-bold text-white font-mono block mt-0.5">-</span>
+          </div>
+          <div>
+            <span class="text-[9px] text-rose-400 block uppercase font-bold">Financial Risk Impact</span>
+            <span id="edit-dep-financial-impact" class="text-xs font-bold text-rose-400 font-mono block mt-0.5">-</span>
+          </div>
+        </div>
+
+        <!-- Dependency Flowchart Chain -->
+        <div class="bg-primary/20 p-2.5 rounded border border-border-color/30 space-y-1.5">
+          <span class="text-[8px] text-muted uppercase font-bold block text-center mb-1 tracking-wider">Dependency Execution Chain</span>
+          <div class="flex items-center justify-between text-[9px] font-bold text-secondary">
+            <span id="chain-node-design" class="px-1.5 py-0.5 rounded border border-border-color/40">Design</span>
+            <span>&rarr;</span>
+            <span id="chain-node-procurement" class="px-1.5 py-0.5 rounded border border-border-color/40">Procurement</span>
+            <span>&rarr;</span>
+            <span id="chain-node-production" class="px-1.5 py-0.5 rounded border border-border-color/40">Production</span>
+            <span>&rarr;</span>
+            <span id="chain-node-dispatch" class="px-1.5 py-0.5 rounded border border-border-color/40">Dispatch</span>
+            <span>&rarr;</span>
+            <span id="chain-node-installation" class="px-1.5 py-0.5 rounded border border-border-color/40">Installation</span>
+          </div>
+        </div>
+
+        <!-- Impact Analysis -->
+        <div class="space-y-2">
+          <span class="text-[9px] text-muted uppercase font-semibold block">Downstream Operational Impact</span>
+          <div class="bg-primary/30 border border-border-color/60 rounded p-2.5 space-y-1.5 text-[10px] max-h-36 overflow-y-auto" id="edit-dep-impact-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[9px] text-muted uppercase font-semibold mb-1">Remarks & Completion Notes</label>
+          <textarea id="edit-dep-remarks" rows="2" placeholder="Enter remarks or completion notes..." class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500 resize-none"></textarea>
+        </div>
+        
+        <!-- Audit Trail / Change History -->
+        <div>
+          <span class="text-[9px] text-muted uppercase font-semibold block mb-1">Change History & Audit Trail</span>
+          <div class="bg-primary/30 border border-border-color/60 rounded p-2.5 max-h-32 overflow-y-auto space-y-1.5 text-[10px]" id="edit-dep-history-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 border-t border-border-color pt-3 mt-4">
+          <button type="button" onclick="window.ModalComponent.deleteDependency()" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded mr-auto">Delete</button>
+          <button type="button" onclick="closeModal('edit-dependency-modal')" class="px-3.5 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color">Cancel</button>
+          <button type="submit" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded">Save Dependency Details</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Health Details Modal -->
+  <div id="health-details-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-2xl rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in max-h-[90vh]">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <div>
+          <h3 class="text-sm font-semibold font-display text-white">PROJECT HEALTH DETAILS</h3>
+          <span id="health-details-project-title" class="text-[10px] text-secondary"></span>
+        </div>
+        <button onclick="closeModal('health-details-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-4 overflow-y-auto flex-1 max-h-[75vh]">
+        <!-- Calculation Explanation -->
+        <div class="bg-primary/40 rounded-lg p-3 border border-border-color/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <span id="health-details-status-badge" class="px-2 py-0.5 rounded text-[9px] font-bold border inline-block">On Track</span>
+            <h4 class="text-xs font-bold text-white uppercase tracking-tight">Calculation Formula & Deductions</h4>
+            <p class="text-[10px] text-secondary leading-normal max-w-sm">
+              Health score starts at 100. Deductions: open snags (-5), high snags (-5), overdue milestones (-10), overdue deliveries (-8), blocked/overdue dependencies (-7), and pending material specs (-3).
+            </p>
+          </div>
+          <div class="text-center flex-shrink-0 bg-hover p-3 rounded border border-border-color/50">
+            <span class="text-[9px] text-muted block uppercase tracking-wider font-bold">Health Score</span>
+            <span id="health-details-score-display" class="text-2xl font-black text-emerald-400 font-mono block mt-1">78/100</span>
+          </div>
+        </div>
+
+        <!-- Metric breakdown for Management view -->
+        <div class="grid grid-cols-4 gap-2 text-center text-xs">
+          <div id="health-card-completed" onclick="window.ModalComponent.filterHealthLists('completed')" class="bg-primary/20 border border-border-color/40 p-2 rounded cursor-pointer hover:bg-hover hover:border-amber-500/35 transition-all">
+            <span class="text-[9px] text-muted block font-bold uppercase">Completed</span>
+            <span id="health-count-completed" class="text-sm font-bold text-white font-mono block mt-0.5">0</span>
+          </div>
+          <div id="health-card-pending" onclick="window.ModalComponent.filterHealthLists('pending')" class="bg-amber-500/5 border border-amber-500/10 p-2 rounded cursor-pointer hover:bg-hover hover:border-amber-500/35 transition-all">
+            <span class="text-[9px] text-amber-400 block font-bold uppercase">Pending</span>
+            <span id="health-count-pending" class="text-sm font-bold text-amber-400 font-mono block mt-0.5">0</span>
+          </div>
+          <div id="health-card-blocked" onclick="window.ModalComponent.filterHealthLists('blocked')" class="bg-rose-500/5 border border-rose-500/10 p-2 rounded cursor-pointer hover:bg-hover hover:border-amber-500/35 transition-all">
+            <span class="text-[9px] text-rose-400 block font-bold uppercase">Blocked</span>
+            <span id="health-count-blocked" class="text-sm font-bold text-rose-400 font-mono block mt-0.5">0</span>
+          </div>
+          <div id="health-card-overdue" onclick="window.ModalComponent.filterHealthLists('overdue')" class="bg-red-500/10 border border-red-500/20 p-2 rounded cursor-pointer hover:bg-hover hover:border-amber-500/35 transition-all">
+            <span class="text-[9px] text-rose-500 block font-bold uppercase">Overdue</span>
+            <span id="health-count-overdue" class="text-sm font-bold text-rose-500 font-mono block mt-0.5">0</span>
+          </div>
+        </div>
+
+        <!-- Lists of activities -->
+        <div class="space-y-4 pt-2">
+          <div>
+            <h5 class="text-xs font-bold text-white mb-2 flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400"></i> Completed Activities</h5>
+            <div id="health-list-completed" class="text-xs space-y-1.5 bg-hover/10 p-2 rounded border border-border-color/20 max-h-36 overflow-y-auto"></div>
+          </div>
+          <div>
+            <h5 class="text-xs font-bold text-white mb-2 flex items-center gap-1"><i data-lucide="help-circle" class="w-3.5 h-3.5 text-amber-400"></i> Pending Activities</h5>
+            <div id="health-list-pending" class="text-xs space-y-1.5 bg-hover/10 p-2 rounded border border-border-color/20 max-h-36 overflow-y-auto"></div>
+          </div>
+          <div>
+            <h5 class="text-xs font-bold text-white mb-2 flex items-center gap-1"><i data-lucide="slash" class="w-3.5 h-3.5 text-rose-400 animate-pulse"></i> Blocked Activities</h5>
+            <div id="health-list-blocked" class="text-xs space-y-1.5 bg-hover/10 p-2 rounded border border-border-color/20 max-h-36 overflow-y-auto"></div>
+          </div>
+          <div>
+            <h5 class="text-xs font-bold text-white mb-2 flex items-center gap-1"><i data-lucide="alert-octagon" class="w-3.5 h-3.5 text-rose-500"></i> Overdue Activities</h5>
+            <div id="health-list-overdue" class="text-xs space-y-1.5 bg-hover/10 p-2 rounded border border-border-color/20 max-h-36 overflow-y-auto"></div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 border-t border-border-color pt-3">
+          <button type="button" onclick="closeModal('health-details-modal')" class="px-4 py-2 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color">Close Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Progress Breakdown Modal -->
+  <div id="progress-breakdown-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-xl rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in max-h-[90vh]">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <div>
+          <h3 class="text-sm font-semibold font-display text-white">PROJECT PROGRESS BREAKDOWN</h3>
+          <span id="progress-breakdown-project-title" class="text-[10px] text-secondary font-medium"></span>
+        </div>
+        <button onclick="closeModal('progress-breakdown-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="progress-breakdown-form" class="p-5 space-y-4 overflow-y-auto flex-1 max-h-[75vh]">
+        <p class="text-xs text-secondary leading-normal">
+          Adjust the progress percentage for active trades. Updating trades dynamically recalculates overall project progress.
+        </p>
+
+        <!-- Trade Progress Sliders -->
+        <div class="bg-primary/20 border border-border-color/30 rounded-lg p-3 space-y-2.5">
+          <div class="grid grid-cols-1 gap-2 text-[11px]">
+            <div class="flex items-center gap-3">
+              <span class="w-24 text-secondary font-medium">Carpentry</span>
+              <input type="range" id="breakdown-trade-carpentry" min="0" max="100" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="w-10 text-right font-mono font-bold text-white">0%</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-24 text-secondary font-medium">Electrical</span>
+              <input type="range" id="breakdown-trade-electrical" min="0" max="100" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="w-10 text-right font-mono font-bold text-white">0%</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-24 text-secondary font-medium">Painting</span>
+              <input type="range" id="breakdown-trade-painting" min="0" max="100" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="w-10 text-right font-mono font-bold text-white">0%</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-24 text-secondary font-medium">False Ceiling</span>
+              <input type="range" id="breakdown-trade-falseCeiling" min="0" max="100" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="w-10 text-right font-mono font-bold text-white">0%</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-24 text-secondary font-medium">Stone</span>
+              <input type="range" id="breakdown-trade-stone" min="0" max="100" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="w-10 text-right font-mono font-bold text-white">0%</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-24 text-secondary font-medium">Glass</span>
+              <input type="range" id="breakdown-trade-glass" min="0" max="100" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="w-10 text-right font-mono font-bold text-white">0%</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-24 text-secondary font-medium">Modular</span>
+              <input type="range" id="breakdown-trade-modular" min="0" max="100" class="flex-1 accent-amber-500" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="w-10 text-right font-mono font-bold text-white">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Work Categories List -->
+        <div class="space-y-3 pt-2">
+          <div>
+            <span class="text-[9px] text-emerald-400 uppercase font-mono font-bold block mb-1">Completed Site Work (Milestones)</span>
+            <div id="breakdown-list-completed" class="text-xs space-y-1 text-secondary bg-emerald-500/5 p-2 rounded border border-emerald-500/10 max-h-24 overflow-y-auto"></div>
+          </div>
+          <div>
+            <span class="text-[9px] text-amber-400 uppercase font-mono font-bold block mb-1">Pending Site Work</span>
+            <div id="breakdown-list-pending" class="text-xs space-y-1 text-secondary bg-amber-500/5 p-2 rounded border border-amber-500/10 max-h-24 overflow-y-auto"></div>
+          </div>
+          <div>
+            <span class="text-[9px] text-rose-400 uppercase font-mono font-bold block mb-1">Blocked / Overdue Site Work</span>
+            <div id="breakdown-list-blocked" class="text-xs space-y-1 text-secondary bg-rose-500/5 p-2 rounded border border-rose-500/10 max-h-24 overflow-y-auto"></div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 border-t border-border-color pt-3 mt-4">
+          <button type="button" onclick="closeModal('progress-breakdown-modal')" class="px-3.5 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color">Cancel</button>
+          <button type="submit" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded">Save Trade Progress</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Bottleneck Details Modal -->
+  <div id="bottleneck-details-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-md rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in max-h-[90vh]">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <div>
+          <h3 class="text-sm font-semibold font-display text-white">Project Bottleneck Details</h3>
+          <span id="bottleneck-details-project" class="text-[10px] text-secondary font-medium"></span>
+        </div>
+        <button onclick="closeModal('bottleneck-details-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-4 overflow-y-auto flex-1 max-h-[75vh] text-xs">
+        <div class="bg-rose-500/10 border border-rose-500/20 p-3 rounded-lg space-y-2">
+          <div class="flex justify-between items-start">
+            <h4 id="bottleneck-details-activity" class="font-bold text-white text-sm truncate max-w-[240px]"></h4>
+            <span id="bottleneck-details-days" class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 font-mono font-bold text-[9px] border border-rose-500/30 flex-shrink-0"></span>
+          </div>
+          <div class="grid grid-cols-2 gap-y-1.5 text-secondary text-[10px] mt-1 pt-1.5 border-t border-border-color/20">
+            <div>Blocked By: <span id="bottleneck-details-blocked" class="text-white font-semibold"></span></div>
+            <div>Owner: <span id="bottleneck-details-owner" class="text-white"></span></div>
+            <div>Expected Resolution: <span id="bottleneck-details-resolution" class="text-white font-mono"></span></div>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <span class="text-[10px] text-muted uppercase font-semibold block">Downstream Operational Impact</span>
+          <div class="bg-primary/20 border border-border-color/30 rounded p-2.5 space-y-1.5" id="bottleneck-impact-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <span class="text-[10px] text-muted uppercase font-semibold block">Latest Remarks & Updates</span>
+          <p id="bottleneck-details-remarks" class="text-secondary italic leading-relaxed bg-hover/20 p-2.5 rounded border border-border-color/20"></p>
+        </div>
+        
+        <div class="space-y-2">
+          <span class="text-[10px] text-muted uppercase font-semibold block">Resolution Audit Trail</span>
+          <div id="bottleneck-history-list" class="space-y-1.5 max-h-24 overflow-y-auto bg-hover/10 p-2 rounded text-[10px]">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 border-t border-border-color pt-3">
+          <button type="button" onclick="closeModal('bottleneck-details-modal')" class="px-3.5 py-1.5 bg-primary hover:bg-hover border border-border-color text-white text-xs rounded">Close</button>
+          <button type="button" id="bottleneck-action-resolve" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded">Edit / Resolve</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Waiting Details Modal -->
+  <div id="waiting-details-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-md rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in max-h-[90vh]">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <div>
+          <h3 class="text-sm font-semibold font-display text-white">Pending Item Impact Details</h3>
+          <span id="waiting-project-title" class="text-[10px] text-secondary font-medium"></span>
+        </div>
+        <button onclick="closeModal('waiting-details-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-4 overflow-y-auto flex-1 max-h-[75vh] text-xs">
+        <div class="bg-amber-500/5 border border-amber-500/25 p-4 rounded-lg space-y-2">
+          <span class="text-[9px] text-amber-500 font-bold uppercase tracking-wider block">WAITING FOR ACTION</span>
+          <h4 id="waiting-title" class="font-bold text-white text-sm"></h4>
+          <div class="grid grid-cols-2 gap-y-1.5 text-secondary text-[10px] pt-1">
+            <div>Owner: <span id="waiting-owner" class="text-white"></span></div>
+            <div>Since Date: <span id="waiting-since" class="text-white font-mono"></span></div>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <span class="text-[10px] text-muted uppercase font-semibold block">Downstream Affected Activities</span>
+          <div class="bg-primary/20 border border-border-color/30 rounded p-2.5" id="waiting-affected-list"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-center">
+          <div class="bg-primary/20 border border-border-color/40 p-2 rounded">
+            <span class="text-[9px] text-muted block uppercase font-bold">Estimated Delay</span>
+            <span id="waiting-delay-est" class="text-sm font-bold text-white font-mono block mt-0.5"></span>
+          </div>
+          <div class="bg-rose-500/5 border border-rose-500/20 p-2 rounded">
+            <span class="text-[9px] text-rose-400 block uppercase font-bold">Financial Impact</span>
+            <span id="waiting-financial" class="text-sm font-bold text-rose-400 font-mono block mt-0.5"></span>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 border-t border-border-color pt-3 mt-4">
+          <button type="button" onclick="closeModal('waiting-details-modal')" class="px-3.5 py-1.5 bg-primary hover:bg-hover border border-border-color text-white text-xs rounded">Close</button>
+          <button type="button" id="waiting-action-remind" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded flex items-center justify-center gap-1.5 w-full md:w-auto">
+            <i data-lucide="phone" class="w-3.5 h-3.5"></i> Send WhatsApp Reminder
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Decision Modal -->
+  <div id="add-decision-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-sm rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Log Project Decision</h3>
+        <button onclick="closeModal('add-decision-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-decision-form" class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Decision Date</label>
+          <input type="text" id="new-decision-date" required placeholder="DD-MM-YYYY" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Requested By</label>
+          <input type="text" id="new-decision-requested-by" required placeholder="e.g. Client, Architect, Factory" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Approved By</label>
+          <input type="text" id="new-decision-approved-by" required placeholder="e.g. Abhilash Reddy, Client" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Decision Description</label>
+          <textarea id="new-decision-description" required placeholder="Describe the decision details..." class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white h-16"></textarea>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Scope/Operational Impact Category</label>
+          <select id="new-decision-impact" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+            <option value="Structural modification">Structural modification</option>
+            <option value="Interior finish change">Interior finish change</option>
+            <option value="Factory spec update">Factory spec update</option>
+            <option value="Vendor swap">Vendor swap</option>
+            <option value="Client layout change">Client layout change</option>
+            <option value="Cost & timeline alteration">Cost & timeline alteration</option>
+            <option value="No Operational Impact">No Operational Impact</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Cost Impact (₹)</label>
+            <input type="number" id="new-decision-cost-impact" placeholder="0" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Time Impact (Days)</label>
+            <input type="number" id="new-decision-time-impact" placeholder="0" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Attachments (Simulated)</label>
+          <input type="text" id="new-decision-attachment-name" placeholder="e.g. approved_drawing_v2.pdf" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('add-decision-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Log Decision</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Scope Change Modal -->
+  <div id="add-change-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-sm rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Log Scope Change</h3>
+        <button onclick="closeModal('add-change-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="create-change-form" class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Change Date</label>
+          <input type="text" id="new-change-date" required placeholder="DD-MM-YYYY" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white focus:outline-none focus:border-amber-500">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Reason for Scope Change</label>
+          <input type="text" id="new-change-reason" required placeholder="e.g. Wardrobe design updated by architect" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Original Scope (Before Change)</label>
+          <textarea id="new-change-original-scope" required placeholder="Original dimensions, finishes, or details..." class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white h-12"></textarea>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Revised Scope (After Change)</label>
+          <textarea id="new-change-revised-scope" required placeholder="New dimensions, finishes, or details..." class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white h-12"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Cost Diff (₹, +/-)</label>
+            <input type="number" id="new-change-cost-diff" required placeholder="e.g. 15000 or -5000" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+          <div>
+            <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Timeline Diff (Days, +/-)</label>
+            <input type="number" id="new-change-time-diff" required placeholder="e.g. 5 or -2" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] text-muted uppercase font-semibold mb-1">Approval Status</label>
+          <select id="new-change-status" class="w-full text-xs p-2 rounded border border-border-color bg-primary text-white">
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-6">
+          <button type="button" onclick="closeModal('add-change-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Cancel</button>
+          <button type="submit" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold rounded transition-colors">Log Change</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Daily Report Generator Modal -->
+  <div id="daily-report-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-xl rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white">Daily Report Generator</h3>
+        <button onclick="closeModal('daily-report-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5 flex-1 flex flex-col min-h-0 overflow-y-auto space-y-4">
+        <!-- Tabs Header -->
+        <div class="flex border-b border-border-color pb-2 gap-2" id="daily-report-tabs">
+          <button type="button" onclick="window.ModalComponent.switchReportTab('client')" id="report-tab-client" class="report-tab-btn px-2.5 py-1 rounded text-xs transition-colors bg-amber-500 text-black font-semibold">Client View</button>
+          <button type="button" onclick="window.ModalComponent.switchReportTab('management')" id="report-tab-management" class="report-tab-btn px-2.5 py-1 rounded text-xs transition-colors text-secondary hover:text-white bg-hover">Management Brief</button>
+          <button type="button" onclick="window.ModalComponent.switchReportTab('site')" id="report-tab-site" class="report-tab-btn px-2.5 py-1 rounded text-xs transition-colors text-secondary hover:text-white bg-hover">Site Log</button>
+          <button type="button" onclick="window.ModalComponent.switchReportTab('vendor')" id="report-tab-vendor" class="report-tab-btn px-2.5 py-1 rounded text-xs transition-colors text-secondary hover:text-white bg-hover">Vendor Sync</button>
+        </div>
+        <!-- Tab Content -->
+        <div class="flex-1 min-h-[220px] bg-primary/20 border border-border-color/40 rounded p-3 text-xs leading-relaxed font-mono whitespace-pre-wrap text-white overflow-y-auto animate-fade-in" id="daily-report-text-content">
+          <!-- Text generated dynamically -->
+        </div>
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between items-center border-t border-border-color pt-4 gap-3">
+          <div class="text-[10px] text-muted italic">Ready to share formatted update!</div>
+          <div class="flex gap-2 w-full sm:w-auto">
+            <button type="button" onclick="closeModal('daily-report-modal')" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors">Close</button>
+            <button type="button" onclick="window.ModalComponent.copyReportToClipboard()" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors flex items-center justify-center gap-1.5">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Text
+            </button>
+            <button type="button" onclick="window.ModalComponent.printReport()" class="px-3 py-1.5 bg-primary hover:bg-hover text-white text-xs rounded border border-border-color transition-colors flex items-center justify-center gap-1.5">
+              <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print
+            </button>
+            <button type="button" onclick="window.ModalComponent.shareReportWhatsApp()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded transition-colors flex items-center justify-center gap-1.5">
+              <i data-lucide="phone" class="w-3.5 h-3.5"></i> WhatsApp
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cash Flow Drill-Down Modal -->
+  <div id="cash-flow-drilldown-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50 animate-fade-in no-print">
+    <div class="bg-secondary border border-border-color w-full max-w-3xl rounded-lg overflow-hidden flex flex-col shadow-2xl animate-scale-in">
+      <div class="p-4 border-b border-border-color flex justify-between items-center bg-primary">
+        <h3 class="text-sm font-semibold font-display text-white" id="cash-flow-modal-title">Cash Flow Ledger Details</h3>
+        <button onclick="closeModal('cash-flow-drilldown-modal')" class="text-secondary hover:text-white transition-colors">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5 flex-1 flex flex-col space-y-4 max-h-[75vh] overflow-y-auto">
+        <!-- Summary Cards inside drilldown -->
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="bg-primary/20 border border-border-color/30 p-2.5 rounded">
+            <span class="text-[9px] text-muted block uppercase font-semibold">Total Category Amount</span>
+            <span id="cash-flow-total-val" class="text-sm font-bold text-amber-500 font-mono block mt-0.5">₹0</span>
+          </div>
+          <div class="bg-primary/20 border border-border-color/30 p-2.5 rounded">
+            <span class="text-[9px] text-muted block uppercase font-semibold">Projects Covered</span>
+            <span id="cash-flow-projects-count" class="text-sm font-bold text-white font-mono block mt-0.5">0</span>
+          </div>
+          <div class="bg-primary/20 border border-border-color/30 p-2.5 rounded">
+            <span class="text-[9px] text-muted block uppercase font-semibold">Outstanding Actions</span>
+            <span id="cash-flow-pending-count" class="text-sm font-bold text-rose-400 font-mono block mt-0.5">0 Items</span>
+          </div>
+        </div>
+
+        <!-- Detail Table -->
+        <div class="overflow-x-auto border border-border-color/30 rounded-lg">
+          <table class="w-full text-[11px] text-left">
+            <thead class="bg-primary/40 text-secondary border-b border-border-color/30 uppercase font-semibold text-[9px]">
+              <tr>
+                <th class="p-2">Project</th>
+                <th class="p-2" id="cf-th-ref">Reference Details</th>
+                <th class="p-2" id="cf-th-recipient">Recipient / Client</th>
+                <th class="p-2 text-right">Amount (₹)</th>
+                <th class="p-2">Date / Deadline</th>
+                <th class="p-2 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="cash-flow-details-tbody" class="divide-y divide-border-color/10 text-white font-sans">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex justify-end gap-2 border-t border-border-color pt-4 mt-4">
+          <button type="button" onclick="closeModal('cash-flow-drilldown-modal')" class="px-3.5 py-1.5 bg-primary hover:bg-hover border border-border-color text-white text-xs rounded transition-colors">Close Ledger View</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lucide Icons via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+  
+  <!-- Modular Scripts sequential imports -->
+  <script src="js/store/state.js"></script>
+  <script src="js/utils/format.js"></script>
+  <script src="js/services/db.js"></script>
+  <script src="js/services/file-cache.js"></script>
+  <script src="js/services/auth.js"></script>
+  <script src="js/services/whatsapp.js"></script>
+  <script src="js/components/navbar.js"></script>
+  <script src="js/components/modals.js"></script>
+  <script src="js/pages/today.js"></script>
+  <script src="js/pages/dashboard.js"></script>
+  <script src="js/pages/project.js"></script>
+  <script src="js/pages/vendors.js"></script>
+  <script src="js/pages/pos.js"></script>
+  <script src="js/pages/rfqs.js"></script>
+  <script src="js/pages/procurement.js"></script>
+  <script src="js/pages/payouts.js"></script>
+  <script src="js/pages/intelligence.js"></script>
+  <script src="js/pages/deliveries.js"></script>
+  <script src="js/components/quick-actions.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

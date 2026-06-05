@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premio Living OS — Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    body { background: #0a0a0f; }
+
+    .glass-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(20px);
+    }
+
+    .input-field {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      transition: border-color 0.2s;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #f59e0b;
+      background: rgba(245,158,11,0.05);
+    }
+    .input-field::placeholder { color: rgba(255,255,255,0.3); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { 
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(245,158,11,0.3);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .glow-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #f59e0b;
+      box-shadow: 0 0 12px #f59e0b, 0 0 30px rgba(245,158,11,0.4);
+      animation: pulse-glow 2s infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 12px #f59e0b, 0 0 30px rgba(245,158,11,0.4); }
+      50% { box-shadow: 0 0 20px #f59e0b, 0 0 50px rgba(245,158,11,0.6); }
+    }
+
+    .bg-grid {
+      background-image: 
+        linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .error-msg {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: #f87171;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in { animation: fadeIn 0.5s ease forwards; }
+  </style>
+</head>
+<body class="min-h-screen bg-grid flex items-center justify-center p-4 relative overflow-hidden">
+
+  <!-- Background decorative blobs -->
+  <div class="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-amber-600/5 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="w-full max-w-sm animate-in">
+
+    <!-- Logo & Brand -->
+    <div class="text-center mb-8">
+      <div class="flex items-center justify-center gap-2.5 mb-3">
+        <div class="glow-dot"></div>
+        <span class="font-display font-bold tracking-widest text-white text-lg uppercase">Premio Living</span>
+      </div>
+      <p class="text-xs text-white/40 font-medium tracking-wider uppercase">Interior Execution OS</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="glass-card rounded-2xl p-8">
+
+      <div class="mb-6">
+        <h1 class="text-xl font-display font-bold text-white">Welcome back</h1>
+        <p class="text-xs text-white/40 mt-1">Sign in to access your workspace</p>
+      </div>
+
+      <!-- Error Message -->
+      <div id="error-box" class="hidden error-msg rounded-lg px-4 py-3 text-xs mb-5 flex items-center gap-2">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.072 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+        </svg>
+        <span id="error-text"></span>
+      </div>
+
+      <form id="login-form" class="space-y-4">
+        <div id="name-field-group" class="hidden">
+          <label class="block text-[10px] text-white/50 uppercase font-semibold tracking-wider mb-1.5">Full Name</label>
+          <input 
+            type="text" 
+            id="login-name" 
+            placeholder="John Doe"
+            class="input-field w-full rounded-lg px-4 py-3 text-sm"
+            autocomplete="name"
+          >
+        </div>
+
+        <div id="role-field-group" class="hidden">
+          <label class="block text-[10px] text-white/50 uppercase font-semibold tracking-wider mb-1.5">Workspace Role</label>
+          <select id="login-role" class="input-field w-full rounded-lg px-4 py-3 text-sm focus:outline-none">
+            <option value="site_engineer">Site Engineer</option>
+            <option value="architect">Architect</option>
+            <option value="designer">Designer</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-[10px] text-white/50 uppercase font-semibold tracking-wider mb-1.5">Email Address</label>
+          <input 
+            type="email" 
+            id="login-email" 
+            required 
+            placeholder="you@premioliving.in"
+            class="input-field w-full rounded-lg px-4 py-3 text-sm"
+            autocomplete="email"
+          >
+        </div>
+
+        <div>
+          <label class="block text-[10px] text-white/50 uppercase font-semibold tracking-wider mb-1.5">Password</label>
+          <div class="relative">
+            <input 
+              type="password" 
+              id="login-password" 
+              required 
+              placeholder="••••••••••"
+              class="input-field w-full rounded-lg px-4 py-3 text-sm pr-11"
+              autocomplete="current-password"
+            >
+            <button type="button" id="toggle-pw" onclick="togglePassword()" class="absolute right-3 top-3 text-white/30 hover:text-white/60 transition-colors">
+              <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          id="login-btn"
+          class="btn-primary w-full rounded-lg py-3 text-sm mt-2 flex items-center justify-center gap-2"
+        >
+          <span id="btn-text">Sign In to Workspace</span>
+          <svg id="btn-spinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+        </button>
+
+        <div class="text-center mt-3">
+          <button type="button" id="toggle-mode-btn" onclick="toggleAuthMode()" class="text-xs text-amber-500/70 hover:text-amber-400 underline font-semibold transition-all">Don't have an account? Sign Up</button>
+        </div>
+        <div class="text-center mt-3 pt-3 border-t border-white/5">
+          <button type="button" onclick="skipToDemoMode()" class="text-xs text-white/40 hover:text-white transition-colors flex items-center justify-center gap-1 mx-auto font-medium">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+            </svg>
+            Skip to Demo Mode (Offline)
+          </button>
+        </div>
+      </form>
+
+      <!-- Role Info -->
+      <div class="mt-6 pt-5 border-t border-white/5">
+        <p class="text-[10px] text-white/30 text-center mb-3 uppercase tracking-wider font-semibold">Access Levels</p>
+        <div class="flex flex-wrap gap-1.5 justify-center">
+          <span class="role-badge bg-amber-500/10 text-amber-400 border border-amber-500/20">👑 Admin</span>
+          <span class="role-badge bg-blue-500/10 text-blue-400 border border-blue-500/20">🏗️ Architect</span>
+          <span class="role-badge bg-purple-500/10 text-purple-400 border border-purple-500/20">✏️ Designer</span>
+          <span class="role-badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">🔧 Engineer</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center text-[10px] text-white/20 mt-6">
+      Premio Living OS • Secure Access • v2.0
+    </p>
+
+    <!-- Connect Supabase settings card -->
+    <div class="text-center mt-3">
+      <button onclick="document.getElementById('sb-config-section').classList.toggle('hidden')" class="text-[10px] text-amber-500/70 hover:text-amber-400 underline font-semibold transition-all">⚙️ Database Setup: Connect Supabase</button>
+    </div>
+
+    <div id="sb-config-section" class="hidden glass-card rounded-2xl p-6 mt-4 space-y-4 text-xs">
+      <h3 class="text-xs font-display font-semibold text-white tracking-wide uppercase border-b border-white/5 pb-2">Supabase Database Connection</h3>
+      <div>
+        <label class="block text-[9px] text-white/50 uppercase font-semibold mb-1.5">Project URL</label>
+        <input type="url" id="sb-setup-url" placeholder="https://your-project.supabase.co" class="input-field w-full rounded-lg px-3 py-2 text-xs font-mono">
+      </div>
+      <div>
+        <label class="block text-[9px] text-white/50 uppercase font-semibold mb-1.5">Anon API Key</label>
+        <input type="password" id="sb-setup-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX..." class="input-field w-full rounded-lg px-3 py-2 text-xs font-mono">
+      </div>
+      <button onclick="saveSupabaseSettings()" class="w-full py-2 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-lg text-xs transition-colors">
+        Save & Connect Database
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // ── Supabase Config ──────────────────────────────
+    const SUPABASE_URL = localStorage.getItem('supabase_url') || 'https://qdseorhdifcciyhdaafh.supabase.co';
+    const SUPABASE_ANON_KEY = localStorage.getItem('supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkc2VvcmhkaWZjY2l5aGRhYWZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNjQ4OTcsImV4cCI6MjA5NTY0MDg5N30.ESU8I3658oJSp3VNl1PhUKpBOlFa6MPVyO7G8dgyuYY';
+    const { createClient } = supabase;
+    let sb;
+    try {
+      sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch (e) {
+      console.warn("Supabase not configured or invalid credentials.", e);
+    }
+
+    // Pre-populate settings inputs on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlInput = document.getElementById('sb-setup-url');
+      const keyInput = document.getElementById('sb-setup-key');
+      if (urlInput) urlInput.value = localStorage.getItem('supabase_url') || '';
+      if (keyInput) keyInput.value = localStorage.getItem('supabase_key') || '';
+    });
+
+    function saveSupabaseSettings() {
+      const url = document.getElementById('sb-setup-url').value.trim();
+      const key = document.getElementById('sb-setup-key').value.trim();
+      if (!url || !key) {
+        alert('Please fill out both URL and Key.');
+        return;
+      }
+      localStorage.setItem('supabase_url', url);
+      localStorage.setItem('supabase_key', key);
+      alert('Supabase credentials saved successfully. Page will reload.');
+      window.location.reload();
+    }
+
+    function skipToDemoMode() {
+      localStorage.removeItem('supabase_url');
+      localStorage.removeItem('supabase_key');
+      window.location.replace('index.html');
+    }
+
+    // ── Check if already logged in ───────────────────
+    (async () => {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) {
+          window.location.replace('index.html');
+        }
+      } catch(e) {
+        // If Supabase not configured yet, skip redirect
+      }
+    })();
+
+    // ── Toggle Password Visibility ───────────────────
+    function togglePassword() {
+      const pw = document.getElementById('login-password');
+      pw.type = pw.type === 'password' ? 'text' : 'password';
+    }
+
+    // ── Show/Hide Error ──────────────────────────────
+    function showError(msg) {
+      const box = document.getElementById('error-box');
+      document.getElementById('error-text').textContent = msg;
+      box.classList.remove('hidden');
+      box.classList.add('flex');
+    }
+    function hideError() {
+      const box = document.getElementById('error-box');
+      box.classList.add('hidden');
+      box.classList.remove('flex');
+    }
+
+    let authMode = 'signin';
+    function toggleAuthMode() {
+      const nameGroup = document.getElementById('name-field-group');
+      const roleGroup = document.getElementById('role-field-group');
+      const submitText = document.getElementById('btn-text');
+      const toggleBtn = document.getElementById('toggle-mode-btn');
+      const cardTitle = document.querySelector('h1');
+      const cardSub = document.querySelector('h1 + p');
+      const nameInput = document.getElementById('login-name');
+      
+      if (authMode === 'signin') {
+        authMode = 'signup';
+        nameGroup.classList.remove('hidden');
+        roleGroup.classList.remove('hidden');
+        nameInput.required = true;
+        submitText.textContent = 'Create Team Account';
+        toggleBtn.textContent = 'Already have an account? Sign In';
+        if (cardTitle) cardTitle.textContent = 'Create an Account';
+        if (cardSub) cardSub.textContent = 'Sign up to start collaborating';
+      } else {
+        authMode = 'signin';
+        nameGroup.classList.add('hidden');
+        roleGroup.classList.add('hidden');
+        nameInput.required = false;
+        submitText.textContent = 'Sign In to Workspace';
+        toggleBtn.textContent = "Don't have an account? Sign Up";
+        if (cardTitle) cardTitle.textContent = 'Welcome back';
+        if (cardSub) cardSub.textContent = 'Sign in to access your workspace';
+      }
+    }
+
+    // ── Set Loading State ────────────────────────────
+    function setLoading(loading) {
+      const btn = document.getElementById('login-btn');
+      const text = document.getElementById('btn-text');
+      const spinner = document.getElementById('btn-spinner');
+      btn.disabled = loading;
+      if (authMode === 'signin') {
+        text.textContent = loading ? 'Signing in...' : 'Sign In to Workspace';
+      } else {
+        text.textContent = loading ? 'Creating account...' : 'Create Team Account';
+      }
+      spinner.classList.toggle('hidden', !loading);
+    }
+
+    // ── Login Form Submit ────────────────────────────
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideError();
+
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const name = document.getElementById('login-name').value.trim();
+      const role = document.getElementById('login-role').value;
+
+      if (!email || !password) {
+        showError('Please enter your email and password.');
+        return;
+      }
+
+      if (authMode === 'signup') {
+        if (!name) {
+          showError('Please enter your full name.');
+          return;
+        }
+        // Force security check on frontend: only abhilash@premioliving.in can signup as admin
+        if (role === 'admin' && email.toLowerCase() !== 'abhilash@premioliving.in') {
+          showError('Security Restriction: Only abhilash@premioliving.in can register as an Admin.');
+          return;
+        }
+      }
+
+      // Check if Supabase is configured
+      if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_URL === '') {
+        showError('Supabase not configured yet. Please add your Supabase URL and API key first.');
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        if (authMode === 'signin') {
+          const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+          if (error) {
+            showError(error.message || 'Invalid email or password. Please try again.');
+            setLoading(false);
+            return;
+          }
+
+          if (data.session) {
+            // Verify profile exists
+            let { data: profile } = await sb.from('profiles').select('role, name').eq('id', data.user.id).single();
+            if (!profile) {
+              // Fail-safe: Auto-create profile in database if missing
+              const fallbackName = data.user.user_metadata?.name || data.user.email.split('@')[0];
+              const fallbackRole = data.user.user_metadata?.role || (data.user.email.toLowerCase() === 'abhilash@premioliving.in' ? 'admin' : 'site_engineer');
+              
+              const { error: insertError } = await sb.from('profiles').insert({
+                id: data.user.id,
+                name: fallbackName,
+                role: fallbackRole
+              });
+              
+              if (!insertError) {
+                profile = { name: fallbackName, role: fallbackRole };
+              } else {
+                await sb.auth.signOut();
+                showError('Profile initialization failed: ' + (insertError.message || JSON.stringify(insertError)));
+                setLoading(false);
+                return;
+              }
+            }
+
+            // Store credentials for db.js to use
+            localStorage.setItem('supabase_url', SUPABASE_URL);
+            localStorage.setItem('supabase_key', SUPABASE_ANON_KEY);
+            window.location.replace('index.html');
+          }
+        } else {
+          // Sign Up
+          const { data, error } = await sb.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                name: name,
+                role: role // Pass selected role
+              }
+            }
+          });
+
+          if (error) {
+            showError(error.message || 'Sign up failed. Please try again.');
+            setLoading(false);
+            return;
+          }
+
+          alert('Sign up successful! Please check your email for confirmation or sign in now.');
+          
+          // Switch back to signin
+          toggleAuthMode();
+          setLoading(false);
+        }
+      } catch(err) {
+        showError('Connection error. Check your internet and try again.');
+        setLoading(false);
+      }
+    });
+  </script>
+</body>
+</html>
